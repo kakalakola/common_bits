@@ -13,13 +13,8 @@
 */
 var functionGetById
     ,functionGetByTag
-
     ,functionCreateElement
-
-
     ,functionAppendScript
-
-
     ,doc=document
 
     ;
