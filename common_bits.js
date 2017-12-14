@@ -57,7 +57,6 @@ const doc=document
           xhr.open("POST",strUrl,true);
           //Standard load & error bits, but instead of functions as response, resolve & reject are set
           xhr.onload=function(){
-            console.log("XHR load complete");
             if(this.status>=200 && this.status<300){
               resolve(xhr.response);
             }else{
