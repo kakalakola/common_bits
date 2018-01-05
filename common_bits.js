@@ -1,7 +1,7 @@
 /*
   COMMON_BITS
   By: Saad Azim
-  Last Edit: 2018.01.05
+  Last Edit: 2017.12.29
 
   I made this basically to make coding a little easier for me. The initial ideas behind this were:
     a) using easy to understand names
@@ -14,53 +14,52 @@
 
 /*jslint es6:true,this:true*/
 const doc=document
-      ,arg=arguments
 
 
       //Standard bits for getting things by ID, tag, or class
       //If no parent object is provided, defaults to document
       ,functionGetById=function(){
         'use strict';
-        const prnt=arg[1] || doc;
-        return prnt.getElementById(arg[0]);
+        const prnt=arguments[1] || doc;
+        return prnt.getElementById(arguments[0]);
       }
       ,functionGetByTag=function(){
         'use strict';
-        const prnt=arg[1] || doc;
-        return prnt.getElementsByTagName(arg[0]);
+        const prnt=arguments[1] || doc;
+        return prnt.getElementsByTagName(arguments[0]);
       }
       ,functionGetByClass=function(){
         'use strict';
-        const prnt=arg[1] || doc;
-        return prnt.getElementsByClassName(arg[0]);
+        const prnt=arguments[1] || doc;
+        return prnt.getElementsByClassName(arguments[0]);
       }
 
       //Set and clear a given class
       ,functionClearClass=function(){
         'use strict';
-        var tmpElement=arg[0];
-        tmpElement.classList.remove(arg[1]);
+        var tmpElement=arguments[0];
+        tmpElement.classList.remove(arguments[1]);
       }
       ,functionSetClass=function(){
         'use strict';
-        var tmpElement=arg[0];
-        //Clean up the classname to avoid duplicates
-        functionClearClass(tmpElement,arg[1]);
-        tmpElement.classList.add(arg[1]);
+        var tmpElement=arguments[0];
+        //Clean up the classname to void duplicates duplicates
+        functionClearClass(tmpElement,arguments[1]);
+        tmpElement.classList.add(arguments[1]);
       }
 
       ,functionExterminate=function(){
         'use strict';
-        var tmpElement=arg[0];
+        var tmpElement=arguments[0];
         tmpElement.parentNode.removeChild(tmpElement);
       }
 
       ,functionAddEventListener=function(){
         'use strict';
-        var tmpElement=arg[0]
-            ,strType=arg[1]
-            ,functionResponse=arg[2]
-            ,boolBubble=arg[3] || false
+        var tmpElement=arguments[0]
+            ,strType=arguments[1]
+            ,functionResponse=arguments[2]
+            ,boolBubble=arguments[3] || false
             ;
         tmpElement.addEventListener(strType,functionResponse,boolBubble);     
       }
@@ -68,8 +67,8 @@ const doc=document
       //Loop through array of attribute names & properties, and call setAttribute
       ,functionSetAttributes=function(){
         'use strict';
-        var tmpElement=arg[0];
-        arg[1].forEach(function(attribute){
+        var tmpElement=arguments[0];
+        arguments[1].forEach(function(attribute){
         tmpElement.setAttribute(attribute[0],attribute[1]);
         });
         return tmpElement;
@@ -78,23 +77,23 @@ const doc=document
       //Create a given element
       ,functionCreateElement=function(){
         'use strict';
-        //arg[0]=DOM Element
-        //arg[1]=ID
-        //arg[2]=Attributes
-        //arg[3]=Class
-        var tmpElement=doc.createElement(arg[0])
+        //arguments[0]=DOM Element
+        //arguments[1]=ID
+        //arguments[2]=Attributes
+        //arguments[3]=Class
+        var tmpElement=doc.createElement(arguments[0])
             ;
         //Set ID if applicable
-        if(arg[1] && arg[1]!==null){
-          tmpElement.id=arg[1];
+        if(arguments[1] && arguments[1]!==null){
+          tmpElement.id=arguments[1];
         }
         //If attributes are provided, call functionSetAttributes
-        if(arg[2] && arg[2].length>0){
-          tmpElement=functionSetAttributes(tmpElement,arg[2]);
+        if(arguments[2] && arguments[2].length>0){
+          tmpElement=functionSetAttributes(tmpElement,arguments[2]);
         }
         //If a class is provided as a string, set the class
-        if(arg[3]){
-          tmpElement.className=arg[3];
+        if(arguments[3]){
+          tmpElement.className=arguments[3];
         }
         return tmpElement;
       }
@@ -102,20 +101,20 @@ const doc=document
       //Append & prepend text
       ,functionAppendText=function(){
         'use strict';
-        var tmpObject=arg[0];
-        tmpObject.innerHTML+=arg[1];
+        var tmpObject=arguments[0];
+        tmpObject.innerHTML+=arguments[1];
       }
       ,functionPrependText=function(){
         'use strict';
-        var tmpObject=arg[0];
-        tmpObject.innerHTML=arg[1]+tmpObject.innerHTML;
+        var tmpObject=arguments[0];
+        tmpObject.innerHTML=arguments[1]+tmpObject.innerHTML;
       }
 
       //Append form data from a given array of key/value pair
       ,functionAppendFormData=function(){
         'use strict';
         var tmpFormData=new FormData();
-        arg[0].forEach(function(data){
+        arguments[0].forEach(function(data){
           tmpFormData.append(data[0],data[1]);
         });
         return tmpFormData;
@@ -136,17 +135,17 @@ const doc=document
       ,functionSetActive=function(){
         'use strict';
         //A bit of *extra* protection. Clear ALL sibling buttons with 'active' class
-        arg[0].parentNode.childNodes.forEach(function(bit){
+        arguments[0].parentNode.childNodes.forEach(function(bit){
           functionClearClass(bit,'active');
         });
-        //functionClearClass(functionGetByClass('active',arg[0].parentNode)[0],'active');
-        functionSetClass(arg[0],'active');
+        //functionClearClass(functionGetByClass('active',arguments[0].parentNode)[0],'active');
+        functionSetClass(arguments[0],'active');
       }
 
       //Builds an element from a provided object
       ,functionBuild=function(){
         'use strict';
-        var bit=arg[0]
+        var bit=arguments[0]
             ,tmpElement
             ,tmpParent
             ,tmpId
@@ -160,7 +159,7 @@ const doc=document
 
         if(bit.type==='img'){tmpElement.src=bit.src;}
 
-        tmpElement.innerHTML=bit.txt || null;
+        tmpElement.innerHTML=bit.txt || '';
         tmpElement.style.display=bit.display || null;
         tmpElement.style.width=bit.width || null;
 
@@ -198,9 +197,9 @@ const doc=document
       //XHR request, now wrapped in promises
       ,functionXHR=function(){
         'use strict';
-        const strUrl=arg[0]
-              ,formData=arg[1]
-              ,functionResponse=arg[1]
+        const strUrl=arguments[0]
+              ,formData=arguments[1]
+              ,functionResponse=arguments[1]
               ;
         //Make a promise object, with resolve(success) & reject(error)
         return new Promise(function(resolve,reject){
