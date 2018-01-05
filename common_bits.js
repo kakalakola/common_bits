@@ -199,7 +199,7 @@ const doc=document
         'use strict';
         const strUrl=arguments[0]
               ,formData=arguments[1]
-              ,functionResponse=arguments[1]
+              ,functionResponse=arguments[2]
               ;
         //Make a promise object, with resolve(success) & reject(error)
         return new Promise(function(resolve,reject){
