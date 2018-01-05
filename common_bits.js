@@ -1,7 +1,7 @@
 /*
   COMMON_BITS
   By: Saad Azim
-  Last Edit: 2017.12.29
+  Last Edit: 2018.01.05
 
   I made this basically to make coding a little easier for me. The initial ideas behind this were:
     a) using easy to understand names
@@ -14,84 +14,108 @@
 
 /*jslint es6:true,this:true*/
 const doc=document
-      //Standard bits, wrapped in functions
+      ,arg=arguments
+
+
+      //Standard bits for getting things by ID, tag, or class
+      //If no parent object is provided, defaults to document
       ,functionGetById=function(){
         'use strict';
-        return doc.getElementById(arguments[0]);
+        const prnt=arg[1] || doc;
+        return prnt.getElementById(arg[0]);
       }
       ,functionGetByTag=function(){
         'use strict';
-        return doc.getElementsByTagName(arguments[0]);
+        const prnt=arg[1] || doc;
+        return prnt.getElementsByTagName(arg[0]);
       }
       ,functionGetByClass=function(){
         'use strict';
-        return doc.getElementsByClassName(arguments[0]);
+        const prnt=arg[1] || doc;
+        return prnt.getElementsByClassName(arg[0]);
       }
 
+      //Set and clear a given class
       ,functionClearClass=function(){
         'use strict';
-        var tmpElement=arguments[0];
-        tmpElement.classList.remove(arguments[1]);
+        var tmpElement=arg[0];
+        tmpElement.classList.remove(arg[1]);
       }
       ,functionSetClass=function(){
         'use strict';
-        var tmpElement=arguments[0];
-        //Clean up the classname in case there are duplicates
-        functionClearClass(tmpElement,arguments[1]);
-        tmpElement.classList.add(arguments[1]);
+        var tmpElement=arg[0];
+        //Clean up the classname to void duplicates duplicates
+        functionClearClass(tmpElement,arg[1]);
+        tmpElement.classList.add(arg[1]);
       }
 
       ,functionExterminate=function(){
         'use strict';
-        var tmpElement=arguments[0];
+        var tmpElement=arg[0];
         tmpElement.parentNode.removeChild(tmpElement);
       }
 
+      ,functionAddEventListener=function(){
+        'use strict';
+        var tmpElement=arg[0]
+            ,strType=arg[1]
+            ,functionResponse=arg[2]
+            ,boolBubble=arg[3] || false
+            ;
+        tmpElement.addEventListener(strType,functionResponse,boolBubble);     
+      }
+
+      //Loop through array of attribute names & properties, and call setAttribute
       ,functionSetAttributes=function(){
         'use strict';
-        //Can't make changes to arguments[0], needs to copy object to a temporary variable and set attributes for that
-        var tmpElement=arguments[0];
-        arguments[1].forEach(function(attribute){
+        var tmpElement=arg[0];
+        arg[1].forEach(function(attribute){
         tmpElement.setAttribute(attribute[0],attribute[1]);
         });
         return tmpElement;
       }
 
+      //Create a given element
       ,functionCreateElement=function(){
         'use strict';
-        //arguments[0]=DOM Element
-        //arguments[1]=ID
-        //arguments[2]=Attributes
-        //arguments[3]=Class
-        var tmpElement=doc.createElement(arguments[0])
+        //arg[0]=DOM Element
+        //arg[1]=ID
+        //arg[2]=Attributes
+        //arg[3]=Class
+        var tmpElement=doc.createElement(arg[0])
             ;
-        if(arguments[1] && arguments[1]!==null){
-          tmpElement.id=arguments[1];
+        //Set ID if applicable
+        if(arg[1] && arg[1]!==null){
+          tmpElement.id=arg[1];
         }
-        if(arguments[2] && arguments[2].length>0){
-          tmpElement=functionSetAttributes(tmpElement,arguments[2]);
+        //If attributes are provided, call functionSetAttributes
+        if(arg[2] && arg[2].length>0){
+          tmpElement=functionSetAttributes(tmpElement,arg[2]);
         }
-        if(arguments[3]){
-          tmpElement.className=arguments[3];
+        //If a class is provided as a string, set the class
+        if(arg[3]){
+          tmpElement.className=arg[3];
         }
         return tmpElement;
       }
 
+      //Append & prepend text
       ,functionAppendText=function(){
         'use strict';
-        var tmpObject=arguments[0];
-        tmpObject.innerHTML+=arguments[1];
+        var tmpObject=arg[0];
+        tmpObject.innerHTML+=arg[1];
       }
       ,functionPrependText=function(){
         'use strict';
-        var tmpObject=arguments[0];
-        tmpObject.innerHTML=arguments[1]+tmpObject.innerHTML;
+        var tmpObject=arg[0];
+        tmpObject.innerHTML=arg[1]+tmpObject.innerHTML;
       }
 
+      //Append form data from a given array of key/value pair
       ,functionAppendFormData=function(){
         'use strict';
         var tmpFormData=new FormData();
-        arguments[0].forEach(function(data){
+        arg[0].forEach(function(data){
           tmpFormData.append(data[0],data[1]);
         });
         return tmpFormData;
@@ -107,10 +131,22 @@ const doc=document
         domParent.appendChild(domScript);
       }
 
+      //Removes 'active' class from all child nodes in the parent node of target, before
+      //adding 'active' to target
+      ,functionSetActive=function(){
+        'use strict';
+        //A bit of *extra* protection. Clear ALL sibling buttons with 'active' class
+        arg[0].parentNode.childNodes.forEach(function(bit){
+          functionClearClass(bit,'active');
+        });
+        //functionClearClass(functionGetByClass('active',arg[0].parentNode)[0],'active');
+        functionSetClass(arg[0],'active');
+      }
 
+      //Builds an element from a provided object
       ,functionBuild=function(){
         'use strict';
-        var bit=arguments[0]
+        var bit=arg[0]
             ,tmpElement
             ,tmpParent
             ,tmpId
@@ -122,12 +158,19 @@ const doc=document
 
         tmpElement=functionCreateElement(bit.type,tmpId,tmpAttribute,bit.grade);
 
+        if(bit.type==='img'){tmpElement.src=bit.src;}
+
         tmpElement.innerHTML=bit.txt || null;
         tmpElement.style.display=bit.display || null;
+        tmpElement.style.width=bit.width || null;
 
         if(bit.listener){
           tmpBubble=bit.listener.bubble || false;
           tmpElement.addEventListener(bit.listener.type,bit.listener.response,tmpBubble);
+        }
+
+        if(bit.value){
+          tmpElement.value=bit.value;
         }
 
         if(bit.domParent.tag){
@@ -137,9 +180,14 @@ const doc=document
         }else if(bit.domParent.grade){
           tmpParent=(bit.domParent.index)?functionGetByClass(bit.domParent.grade)[bit.domParent.index]:functionGetByClass(bit.domParent.grade)[0]; 
         }
+        // else if(bit.domParent.obj){
+          // tmpParent=(bit.domParent.child)?bit.domParent.obj.childNode[bit.domParent.child]:bit.domParent.obj;
+        // }
 
         if(bit.prepend){
-          tmpParent.prepend(tmpElement);
+          //Modified due to compatibility issues with Microsoft Edge -_-
+          //tmpParent.prepend(tmpElement);
+          tmpParent.insertBefore(tmpElement,tmpParent.firstChild);
         }else{
           tmpParent.appendChild(tmpElement);
         }
@@ -148,8 +196,12 @@ const doc=document
       }
 
       //XHR request, now wrapped in promises
-      ,functionXHR=function(strUrl,formData,functionResponse){
+      ,functionXHR=function(){
         'use strict';
+        const strUrl=arg[0]
+              ,formData=arg[1]
+              ,functionResponse=arg[1]
+              ;
         //Make a promise object, with resolve(success) & reject(error)
         return new Promise(function(resolve,reject){
           //Actual XHR bits
