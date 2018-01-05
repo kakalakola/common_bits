@@ -44,7 +44,7 @@ const doc=document
       ,functionSetClass=function(){
         'use strict';
         var tmpElement=arg[0];
-        //Clean up the classname to void duplicates duplicates
+        //Clean up the classname to avoid duplicates
         functionClearClass(tmpElement,arg[1]);
         tmpElement.classList.add(arg[1]);
       }
