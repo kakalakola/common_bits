@@ -1,7 +1,0 @@
-This is the first test.
-
-This is a modification.
-
-This is the second modification.
-
-This is the final modification.
